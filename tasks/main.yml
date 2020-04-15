@@ -1,0 +1,50 @@
+---
+- name: Gather OS specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}-{{ ansible_architecture }}.yml"
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+    #- "{{ ansible_distribution }}.yml"
+  tags:
+    - always
+    - variables
+
+- name: Install SvxLink
+  tags:
+    - install
+  vars:
+    ansible_become: true
+  import_tasks: install.yml
+
+- name: Manage language packs
+  tags:
+    - install
+    - langpacks
+  vars:
+    ansible_become: true
+  include_tasks: install_langpack.yml
+  loop: "{{ svxlink_runner_langpacks }}"
+  loop_control:
+    loop_var: langpack
+    label: "{{ langpack.lang }}"
+  when: svxlink_runner_use_svxlink
+
+- name: Manage configuration files
+  tags:
+    - configure
+  vars:
+    ansible_become: true
+    svxlink_config_dir: /etc/svxlink
+  import_tasks: configure.yml
+
+- name: Enable/disable and start/stop the SvxLink services
+  tags:
+    - install
+    - service
+  vars:
+    ansible_become: true
+  service:
+    name: "{{ item.name }}"
+    state: "{{ item.enabled | ternary('started', 'stopped') }}"
+    enabled: "{{ item.enabled }}"
+  loop: "{{ svxlink_runner_applications }}"

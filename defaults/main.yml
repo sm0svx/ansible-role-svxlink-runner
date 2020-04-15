@@ -1,0 +1,38 @@
+---
+# The local directory where Ansible can find the SvxLink applications config
+svxlink_runner_config: "files/svxlink-{{ inventory_hostname }}"
+
+# The owner of the configuration files
+svxlink_runner_config_owner: "root"
+
+# The group of the configuration files
+svxlink_runner_config_group: "root"
+
+# Configure and start the SvxReflector server
+svxlink_runner_use_svxreflector: false
+
+# Configure and start the SvxLink server
+svxlink_runner_use_svxlink: false
+
+# Configure and start the RemoteTrx server
+svxlink_runner_use_remotetrx: false
+
+# The language packs to install
+svxlink_runner_langpacks:
+  - lang: "en_US"
+    name: "heather"
+    samprate: "16k"
+    url: "https://github.com/sm0svx/svxlink-sounds-en_US-heather/releases/download/19.09.99/svxlink-sounds-en_US-heather-16k-19.09.99.tar.gz"
+
+# The path to the directory where SvxLink non-architecture dependent data are
+# stored
+svxlink_runner_data_dir: "/usr/share/svxlink"
+
+# The path to the directory where TCL event files are stored
+svxlink_runner_eventsd_dir: "{{ svxlink_runner_data_dir }}/events.d"
+
+# The path to the directory where language packs are stored
+svxlink_runner_sounds_dir: "{{ svxlink_runner_data_dir }}/sounds"
+
+# Enable the use of logrotate for SvxLink applications logs
+svxlink_runner_use_logrotate: true

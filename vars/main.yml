@@ -1,0 +1,10 @@
+---
+svxlink_runner_applications:
+  - name: 'svxlink'
+    enabled: "{{ svxlink_runner_use_svxlink }}"
+  - name: 'remotetrx'
+    enabled: "{{ svxlink_runner_use_remotetrx }}"
+  - name: 'svxreflector'
+    enabled: "{{ svxlink_runner_use_svxreflector }}"
+
+svxlink_runner_pkg_dir: "{{ ansible_user_dir }}/pkg"

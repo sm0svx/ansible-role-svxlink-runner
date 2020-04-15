@@ -1,0 +1,10 @@
+/var/log/{{ item.name }} {
+    rotate 4
+    missingok
+    notifempty
+    weekly
+    create 0644 svxlink svxlink
+    postrotate
+        killall -HUP {{ item.name }}
+    endscript
+}

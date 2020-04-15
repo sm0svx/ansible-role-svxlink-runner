@@ -1,0 +1,51 @@
+---
+- name: "Sanity checks"
+  tags:
+    - install
+    - langpacks
+  assert:
+    that:
+      - langpack.lang is defined
+      - langpack.name is defined
+      - langpack.url is defined
+
+- tags:
+    - install
+    - langpacks
+  set_fact:
+    langpack_full_name: "{{ langpack.lang }}-{{ langpack.name }}-{{ langpack.samprate | d('16k') }}"
+
+- name: "Check if the {{ langpack_full_name }} langpack is already downloaded"
+  tags:
+    - install
+    - langpacks
+  stat:
+    path: "{{ svxlink_runner_sounds_dir }}/{{ langpack.url | basename }}"
+  register: stat_langpack_file
+
+- name: "Download the {{ langpack_full_name }} language pack"
+  tags:
+    - install
+    - langpacks
+  get_url:
+    url: "{{ langpack.url }}"
+    dest: "{{ svxlink_runner_sounds_dir }}"
+  when: stat_langpack_file.stat.exists != True
+
+- name: "Unpack the {{ langpack_full_name }} language pack"
+  tags:
+    - install
+    - langpacks
+  unarchive:
+    src: "{{ svxlink_runner_sounds_dir }}/{{ langpack.url | basename }}"
+    dest: "{{ svxlink_runner_sounds_dir }}/"
+    remote_src: true
+
+- name: "Symlink the {{ langpack_full_name }} language pack"
+  tags:
+    - install
+    - langpacks
+  file:
+    state: link
+    src: "{{ langpack_full_name }}"
+    dest: "{{ svxlink_runner_sounds_dir }}/{{ langpack.lang }}"

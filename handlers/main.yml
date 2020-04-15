@@ -1,0 +1,60 @@
+---
+- name: Restart SvxReflector
+  vars:
+    ansible_become: true
+  service:
+    name: svxreflector
+    state: restarted
+  when: svxlink_runner_use_svxreflector
+
+- name: Stop SvxLink
+  vars:
+    ansible_become: true
+  service:
+    name: svxlink
+    state: stopped
+  when: svxlink_runner_use_svxlink
+  listen:
+    - "Restart SvxLink"
+    - "Restart SvxLinkGpioSetup"
+
+- name: Stop RemoteTrx
+  vars:
+    ansible_become: true
+  service:
+    name: remotetrx
+    state: stopped
+  when: svxlink_runner_use_remotetrx
+  listen:
+    - "Restart RemoteTrx"
+    - "Restart SvxLinkGpioSetup"
+
+- name: Restart SvxLinkGpioSetup
+  vars:
+    ansible_become: true
+  service:
+    name: svxlink_gpio_setup
+    state: restarted
+  when: svxlink_runner_use_svxlink or svxlink_runner_use_remotetrx
+
+- name: Start SvxLink
+  vars:
+    ansible_become: true
+  service:
+    name: svxlink
+    state: started
+  when: svxlink_runner_use_svxlink
+  listen:
+    - "Restart SvxLink"
+    - "Restart SvxLinkGpioSetup"
+
+- name: Start RemoteTrx
+  vars:
+    ansible_become: true
+  service:
+    name: remotetrx
+    state: started
+  when: svxlink_runner_use_remotetrx
+  listen:
+    - "Restart RemoteTrx"
+    - "Restart SvxLinkGpioSetup"

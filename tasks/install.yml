@@ -1,0 +1,91 @@
+---
+- name: Install required packages
+  tags:
+    - package
+  package:
+    name: "{{ svxlink_runner_nice_packages + svxlink_runner_packages }}"
+
+#- name: Find built packages to install
+#  vars:
+#    ansible_become: false
+#  local_action: "shell ls -1 *.deb"
+#  args:
+#    chdir: "{{ svxlink_builder_package_dir }}"
+#  register: packages
+#  changed_when: false
+#  failed_when: packages.rc != 0
+#
+#- debug:
+#    msg: "{{ packages.stdout_lines }}"
+
+- set_fact:
+    packages: "{{ query('fileglob', '{{ svxlink_builder_package_dir }}/*.{{ svxlink_runner_package_ext }}') | map('basename') | list }}"
+  tags:
+    - package
+  when: svxlink_runner_package_ext is defined
+
+#- debug:
+#    msg: "{{ packages }}"
+
+- name: Create package cache directory
+  tags:
+    - package
+  vars:
+    ansible_become: False
+  file:
+    path: "{{ svxlink_runner_pkg_dir }}"
+    state: directory
+
+- name: Copy SvxLink packages to target
+  tags:
+    - package
+  vars:
+    ansible_become: False
+  copy:
+    src: "{{ svxlink_builder_package_dir }}/"
+    dest: "{{ svxlink_runner_pkg_dir }}"
+  when: svxlink_runner_package_ext is defined
+
+- name: Workaround bug in older CPack
+  file:
+    name: "/var/spool/svxlink/{{ item }}"
+    owner: svxlink
+    group: svxlink
+    mode: 0755
+    state: directory
+  with_items:
+    - qso_recorder
+    - voice_mail
+    - propagation_monitor
+  when: svxlink_runner_cpack_workaround
+
+- name: Install SvxLink packages on target
+  tags:
+    - package
+  apt:
+    deb: "{{ svxlink_runner_pkg_dir }}/{{ item }}"
+  with_items:
+    - "{{ packages }}"
+  notify:
+    - Restart SvxReflector
+    - Restart SvxLink
+    - Restart RemoteTrx
+    - Restart SvxLinkGpioSetup
+  when: svxlink_runner_package_ext | d('') == 'deb'
+
+- name: Set up logrotate
+  tags:
+    - logrotate
+  template:
+    src: "logrotate.j2"
+    dest: "/etc/logrotate.d/{{ item.name }}"
+  when: svxlink_runner_use_logrotate and item.enabled
+  loop: "{{ svxlink_runner_applications }}"
+
+#- name: Remove locally built package files from target
+#  file:
+#    name: "/tmp/{{ item }}"
+#    state: absent
+#  changed_when: false
+#  with_items:
+#  - "{{ packages }}"
