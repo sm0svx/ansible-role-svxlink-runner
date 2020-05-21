@@ -73,6 +73,12 @@
     - Restart SvxLinkGpioSetup
   when: svxlink_runner_package_ext | d('') == 'deb'
 
+- name: Ensure svxlink user has correct supplemental groups
+  user:
+    name: "{{ svxlink_builder_run_as_user }}"
+    groups: "{{ svxlink_runner_supplemental_groups }}"
+    state: present
+
 - name: Set up logrotate
   tags:
     - logrotate

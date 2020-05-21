@@ -36,3 +36,6 @@ svxlink_runner_sounds_dir: "{{ svxlink_runner_data_dir }}/sounds"
 
 # Enable the use of logrotate for SvxLink applications logs
 svxlink_runner_use_logrotate: true
+
+# Supplemental groups for the user running the svxlink processes
+svxlink_runner_supplemental_groups: []
