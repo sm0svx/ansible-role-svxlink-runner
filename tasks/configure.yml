@@ -11,6 +11,27 @@
         msg: "{{ check_config_change.stdout_lines }}"
       failed_when: true
 
+- name: Find configuration directories
+  vars:
+    ansible_become: no
+  find:
+    paths: "{{ svxlink_runner_config }}"
+    file_type: directory
+    recurse: yes
+  register: directory_list
+  delegate_to: localhost
+
+- name: Ensure configuration directories exist
+  file:
+    #path: "/etc/svxlink/{{ item.path|replace(svxlink_runner_config + '/', '') }}"
+    path: "{{ svxlink_config_dir }}/{{ item.path | relpath(svxlink_runner_config) }}"
+    owner: "{{ svxlink_runner_config_owner }}"
+    group: "{{ svxlink_runner_config_group }}"
+    state: directory
+  with_items: "{{ directory_list.files }}"
+  loop_control:
+    label: "{{ item.path }}"
+
 - name: Find templated configuration files
   vars:
     ansible_become: false
