@@ -49,8 +49,8 @@
 - name: Workaround bug in older CPack
   file:
     name: "/var/spool/svxlink/{{ item }}"
-    owner: svxlink
-    group: svxlink
+    owner: "{{ svxlink_builder_run_as_user }}"
+    group: "{{ svxlink_builder_run_as_group }}"
     mode: 0755
     state: directory
   with_items:
