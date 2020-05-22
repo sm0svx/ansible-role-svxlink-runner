@@ -6,6 +6,7 @@
       chdir: "{{ svxlink_config_dir }}"
     changed_when: false
     register: check_config_change
+    when: not svxlink_runner_config_force
   rescue:
     - debug:
         msg: "{{ check_config_change.stdout_lines }}"

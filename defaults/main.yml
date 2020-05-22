@@ -8,6 +8,9 @@ svxlink_runner_config_owner: "root"
 # The group of the configuration files
 svxlink_runner_config_group: "root"
 
+# Force overwriting svxlink configuration even if it has changed on the target
+svxlink_runner_config_force: False
+
 # Configure and start the SvxReflector server
 svxlink_runner_use_svxreflector: false
 
