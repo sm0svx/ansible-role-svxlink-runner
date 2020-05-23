@@ -1,16 +1,17 @@
 ---
-- block:
-  - name: Check if config files have changed on the target
-    shell: "[ ! -e MD5SUMS ] || md5sum -c MD5SUMS 2>&1"
-    args:
-      chdir: "{{ svxlink_config_dir }}"
-    changed_when: false
-    register: check_config_change
-    when: not svxlink_runner_config_force
-  rescue:
-    - debug:
-        msg: "{{ check_config_change.stdout_lines }}"
-      failed_when: true
+- name: Check if config files have changed on the target
+  shell: "[ ! -e MD5SUMS ] || md5sum -c MD5SUMS 2>&1"
+  args:
+    chdir: "{{ svxlink_config_dir }}"
+  changed_when: false
+  failed_when: false
+  register: check_config_change
+
+- name: Abort if config files have changed on the target
+  debug:
+    msg: "{{ check_config_change.stdout_lines }}"
+  failed_when: not svxlink_runner_config_force
+  when: check_config_change.rc | d(0) != 0
 
 - name: Find configuration directories
   vars:
@@ -24,7 +25,6 @@
 
 - name: Ensure configuration directories exist
   file:
-    #path: "/etc/svxlink/{{ item.path|replace(svxlink_runner_config + '/', '') }}"
     path: "{{ svxlink_config_dir }}/{{ item.path | relpath(svxlink_runner_config) }}"
     owner: "{{ svxlink_runner_config_owner }}"
     group: "{{ svxlink_runner_config_group }}"
@@ -92,7 +92,10 @@
   file:
     path: "{{ svxlink_config_dir }}/MD5SUMS"
     state: absent
-  when: apply_templated_config_files.changed or apply_config_files.changed
+  when: >
+    check_config_change.rc | d(0) != 0 or
+    apply_templated_config_files.changed or
+    apply_config_files.changed
 
 - name: Create checksums for all config
   vars:
@@ -109,7 +112,9 @@
   args:
     chdir: "{{ svxlink_config_dir }}"
     creates: "{{ svxlink_config_dir }}/MD5SUMS"
-  when: find_config_files.matched > 0 or find_templated_config_files.matched > 0
+  when: >
+    find_config_files.matched > 0 or
+    find_templated_config_files.matched > 0
 
 - name: Make sure local-events.d directory exist
   file:
