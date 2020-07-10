@@ -7,11 +7,14 @@
   failed_when: false
   register: check_config_change
 
-- name: Abort if config files have changed on the target
-  debug:
-    msg: "{{ check_config_change.stdout_lines }}"
-  failed_when: not svxlink_runner_config_force
-  when: check_config_change.rc | d(0) != 0
+- set_fact:
+    target_config_changed: "{{ check_config_change.rc | d(0) != 0 }}"
+
+- set_fact:
+    use_diff_mode: "{{ ansible_diff_mode or target_config_changed }}"
+    use_check_mode: >
+      {{ ansible_check_mode or
+         target_config_changed and not svxlink_runner_config_force }}
 
 - name: Find configuration directories
   vars:
@@ -51,6 +54,8 @@
   with_items: "{{ find_templated_config_files.files }}"
   loop_control:
     label: "{{ item.path }}"
+  check_mode: "{{ use_check_mode }}"
+  diff: "{{ use_diff_mode }}"
   notify:
     - Restart SvxLink
     - Restart RemoteTrx
@@ -80,6 +85,8 @@
   with_items: "{{ find_config_files.files }}"
   loop_control:
     label: "{{ item.path }}"
+  check_mode: "{{ use_check_mode }}"
+  diff: "{{ use_diff_mode }}"
   notify:
     - Restart SvxLink
     - Restart RemoteTrx
@@ -87,6 +94,12 @@
     - Restart SvxReflector
   register: apply_config_files
   when: svxlink_runner_config | length > 0
+
+- name: Abort if config files have changed on the target
+  debug:
+    msg: "{{ check_config_change.stdout_lines }}"
+  failed_when: not svxlink_runner_config_force
+  when: target_config_changed
 
 - name: Remove old checksum file
   file:
