@@ -78,6 +78,10 @@
     name: "{{ svxlink_builder_run_as_user }}"
     groups: "{{ svxlink_runner_supplemental_groups }}"
     state: present
+  notify:
+    - Restart SvxReflector
+    - Restart SvxLink
+    - Restart RemoteTrx
 
 - name: Set up logrotate
   tags:
