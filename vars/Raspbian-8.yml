@@ -30,3 +30,4 @@ svxlink_runner_cpack_workaround: true
 svxlink_runner_supplemental_groups_svxlink:
   - audio
   - plugdev
+  - gpio

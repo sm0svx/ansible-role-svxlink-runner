@@ -26,3 +26,8 @@ svxlink_runner_package_ext: "deb"
 # enabling this option will create those directories before trying to install
 # the package
 svxlink_runner_cpack_workaround: false
+
+# Applies to svxlink and remotetrx
+svxlink_runner_supplemental_groups_svxlink:
+  - audio
+  - plugdev

@@ -2,9 +2,9 @@
 - name: Gather OS specific variables
   include_vars: "{{ item }}"
   with_first_found:
-    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}-{{ ansible_architecture }}.yml"
-    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
-    #- "{{ ansible_distribution }}.yml"
+    - "{{ ansible_lsb.id }}-{{ ansible_lsb.major_release }}-{{ ansible_architecture }}.yml"
+    - "{{ ansible_lsb.id }}-{{ ansible_lsb.major_release }}.yml"
+    #- "{{ ansible_lsb.id }}.yml"
   tags:
     - always
     - variables

@@ -8,3 +8,7 @@ svxlink_runner_applications:
     enabled: "{{ svxlink_runner_use_svxreflector }}"
 
 svxlink_runner_pkg_dir: "{{ ansible_user_dir }}/pkg"
+
+svxlink_runner_supplemental_groups: >
+  {{ (svxlink_runner_use_svxlink|bool or svxlink_runner_use_remotetrx|bool)
+     | ternary(svxlink_runner_supplemental_groups_svxlink|d([]), []) }}
