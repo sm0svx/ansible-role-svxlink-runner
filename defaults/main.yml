@@ -1,6 +1,24 @@
 ---
-# The local directory where Ansible can find the SvxLink applications config
-svxlink_runner_config: "files/svxlink-{{ inventory_hostname }}"
+# The directory where SvxLink read its configuration from
+svxlink_runner_config_dir: "/etc/svxlink"
+
+# List of local directories where Ansible can find configuration files.
+# Each list entry is a dict containing:
+#
+#   src=source directory
+#   dest=destination directory
+#   owner=File owner
+#   group=File group
+#
+svxlink_runner_config:
+  - src: "files/{{ inventory_hostname }}/svxlink"
+    dest: "{{ svxlink_runner_config_dir }}"
+    owner: "{{ svxlink_runner_config_owner }}"
+    group: "{{ svxlink_runner_config_group }}"
+  - src: "files/{{ inventory_hostname }}/alsa"
+    dest: "/var/lib/alsa"
+    owner: "root"
+    group: "root"
 
 # The owner of the configuration files
 svxlink_runner_config_owner: "root"

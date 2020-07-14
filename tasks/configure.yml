@@ -1,137 +1,13 @@
 ---
-- name: Check if config files have changed on the target
-  shell: "[ ! -e MD5SUMS ] || md5sum -c MD5SUMS 2>&1"
-  args:
-    chdir: "{{ svxlink_config_dir }}"
-  changed_when: false
-  failed_when: false
-  register: check_config_change
-
-- set_fact:
-    target_config_changed: "{{ check_config_change.rc | d(0) != 0 }}"
-
-- set_fact:
-    use_diff_mode: "{{ ansible_diff_mode or target_config_changed }}"
-    use_check_mode: >
-      {{ ansible_check_mode or
-         target_config_changed and not svxlink_runner_config_force }}
-
-- name: Find configuration directories
-  vars:
-    ansible_become: no
-  find:
-    paths: "{{ svxlink_runner_config }}"
-    file_type: directory
-    recurse: yes
-  register: directory_list
-  delegate_to: localhost
-
-- name: Ensure configuration directories exist
-  file:
-    path: "{{ svxlink_config_dir }}/{{ item.path | relpath(svxlink_runner_config) }}"
-    owner: "{{ svxlink_runner_config_owner }}"
-    group: "{{ svxlink_runner_config_group }}"
-    state: directory
-  with_items: "{{ directory_list.files }}"
+- name: Ensure configuration fileas are up to date on target
+  include_tasks: configure-files.yml
+  with_list: "{{ svxlink_runner_config }}"
   loop_control:
-    label: "{{ item.path }}"
-
-- name: Find templated configuration files
-  vars:
-    ansible_become: false
-  local_action:
-    module: find
-    paths: "{{ svxlink_runner_config }}"
-    patterns: "*.j2"
-    recurse: true
-  register: find_templated_config_files
-  when: svxlink_runner_config | length > 0
-
-- name: Apply templated configuration files
-  template:
-    src: "{{ item.path }}"
-    dest: "{{ svxlink_config_dir }}/{{ (item.path | relpath(svxlink_runner_config) | splitext)[0] }}"
-  with_items: "{{ find_templated_config_files.files }}"
-  loop_control:
-    label: "{{ item.path }}"
-  check_mode: "{{ use_check_mode }}"
-  diff: "{{ use_diff_mode }}"
-  notify:
-    - Restart SvxLink
-    - Restart RemoteTrx
-    - Restart SvxLinkGpioSetup
-    - Restart SvxReflector
-  register: apply_templated_config_files
-  when: svxlink_runner_config | length > 0
-
-- name: Find non-templated configuration files
-  vars:
-    ansible_become: false
-  local_action:
-    module: find
-    paths: "{{ svxlink_runner_config }}"
-    patterns: "*"
-    excludes: "*.j2"
-    recurse: true
-  register: find_config_files
-  when: svxlink_runner_config | length > 0
-
-- name: Apply non-templated configuration files
-  copy:
-    src: "{{ item.path }}"
-    dest: "{{ svxlink_config_dir }}/{{ item.path | relpath(svxlink_runner_config) }}"
-    owner: "{{ svxlink_runner_config_owner }}"
-    group: "{{ svxlink_runner_config_group }}"
-  with_items: "{{ find_config_files.files }}"
-  loop_control:
-    label: "{{ item.path }}"
-  check_mode: "{{ use_check_mode }}"
-  diff: "{{ use_diff_mode }}"
-  notify:
-    - Restart SvxLink
-    - Restart RemoteTrx
-    - Restart SvxLinkGpioSetup
-    - Restart SvxReflector
-  register: apply_config_files
-  when: svxlink_runner_config | length > 0
-
-- name: Abort if config files have changed on the target
-  debug:
-    msg: "{{ check_config_change.stdout_lines }}"
-  failed_when: not svxlink_runner_config_force
-  when: target_config_changed
-
-- name: Remove old checksum file
-  file:
-    path: "{{ svxlink_config_dir }}/MD5SUMS"
-    state: absent
-  when: >
-    check_config_change.rc | d(0) != 0 or
-    apply_templated_config_files.changed or
-    apply_config_files.changed
-
-- name: Create checksums for all config
-  vars:
-    space: ' '
-  shell: >
-    md5sum {{
-      ((find_config_files.files | map(attribute='path') |
-        map('relpath', svxlink_runner_config) | list) +
-       (find_templated_config_files.files | map(attribute='path') |
-        map('relpath', svxlink_runner_config) | map('splitext') |
-        map('first') | list)) |
-      join(space)
-    }} >"{{ svxlink_config_dir }}/MD5SUMS"
-  args:
-    chdir: "{{ svxlink_config_dir }}"
-    creates: "{{ svxlink_config_dir }}/MD5SUMS"
-  when: >
-    find_config_files.matched > 0 or
-    find_templated_config_files.matched > 0
+    loop_var: fileinfo
 
 - name: Make sure local-events.d directory exist
   file:
-    path: "{{ svxlink_config_dir + '/local-events.d' }}"
+    path: "{{ svxlink_runner_config_dir + '/local-events.d' }}"
     owner: "{{ svxlink_runner_config_owner }}"
     group: "{{ svxlink_runner_config_group }}"
     #mode: 0775
@@ -141,7 +17,7 @@
 - name: Symlink local-events.d directory
   file:
     path: "{{ svxlink_runner_eventsd_dir }}/local"
-    src: "{{ (svxlink_config_dir + '/local-events.d') | relpath(svxlink_runner_eventsd_dir) }}"
+    src: "{{ (svxlink_runner_config_dir + '/local-events.d') | relpath(svxlink_runner_eventsd_dir) }}"
     #owner: root
     #group: root
     state: link
