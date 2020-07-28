@@ -18,6 +18,7 @@ svxlink_runner_packages:
   - libcurl3
   - rtl-sdr
   - python-requests
+  - libogg0
 
 svxlink_runner_package_ext: "deb"
 

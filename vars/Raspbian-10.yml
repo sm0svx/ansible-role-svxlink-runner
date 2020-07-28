@@ -19,6 +19,7 @@ svxlink_runner_packages:
   - rtl-sdr
   - libjsoncpp1
   - python-requests
+  - libogg0
 
 svxlink_runner_package_ext: "deb"
 
