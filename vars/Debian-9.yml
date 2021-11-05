@@ -3,6 +3,7 @@ svxlink_runner_nice_packages:
   - vim
   - tmux
   - jq
+  - gpiod
 
 svxlink_runner_packages:
   - libsigc++-2.0-0v5
@@ -20,6 +21,7 @@ svxlink_runner_packages:
   - libjsoncpp1
   - python-requests
   - libogg0
+  - libgpiod1
 
 svxlink_runner_package_ext: "deb"
 
