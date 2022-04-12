@@ -1,0 +1,37 @@
+---
+svxlink_runner_nice_packages:
+  - vim
+  - tmux
+  - jq
+  - gpiod
+
+svxlink_runner_packages:
+  - libsigc++-2.0-0v5
+  - libgsm1
+  - libpopt0
+  - tcl
+  - libgcrypt20
+  - libspeex1
+  - libasound2
+  - libopus0
+  - alsa-utils
+  - vorbis-tools
+  - libcurl4
+  - rtl-sdr
+  - libjsoncpp24
+  - python3-requests
+  - libogg0
+  - libgpiod2
+
+svxlink_runner_package_ext: "deb"
+
+# Older versions of CPack does not include directories in the package so
+# enabling this option will create those directories before trying to install
+# the package
+svxlink_runner_cpack_workaround: false
+
+# Applies to svxlink and remotetrx
+svxlink_runner_supplemental_groups_svxlink:
+  - audio
+  - plugdev
+  - gpio
