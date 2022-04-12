@@ -64,6 +64,7 @@
     - package
   apt:
     deb: "{{ svxlink_runner_pkg_dir }}/{{ item }}"
+    force: True
   with_items:
     - "{{ packages }}"
   notify:
