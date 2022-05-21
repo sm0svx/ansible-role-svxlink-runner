@@ -22,3 +22,21 @@
     #group: root
     state: link
   when: svxlink_runner_use_svxlink
+
+- name: Make sure local-sounds.d directory exist
+  file:
+    path: "{{ svxlink_runner_config_dir + '/local-sounds.d' }}"
+    owner: "{{ svxlink_runner_config_owner }}"
+    group: "{{ svxlink_runner_config_group }}"
+    #mode: 0775
+    state: directory
+  when: svxlink_runner_use_svxlink
+
+- name: Symlink local-sounds.d directory
+  file:
+    path: "{{ svxlink_runner_sounds_dir }}/local"
+    src: "{{ (svxlink_runner_config_dir + '/local-sounds.d') | relpath(svxlink_runner_sounds_dir) }}"
+    #owner: root
+    #group: root
+    state: link
+  when: svxlink_runner_use_svxlink
