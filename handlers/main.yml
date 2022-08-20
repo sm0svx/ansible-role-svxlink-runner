@@ -58,3 +58,11 @@
   listen:
     - "Restart RemoteTrx"
     - "Restart SvxLinkGpioSetup"
+
+- name: Restart Rsyslogd
+  vars:
+    ansible_become: true
+  service:
+    name: rsyslog
+    state: restarted
+  listen: restart_rsyslogd

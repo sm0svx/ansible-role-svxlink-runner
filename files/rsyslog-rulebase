@@ -1,0 +1,25 @@
+version=2
+
+# Match date and time in all log lines
+prefix=%date:date-iso% %time:time-24hr%.%msec:number%:%-:whitespace%
+
+# Match error messages
+rule=error:*** ERROR: %msg:rest%
+annotate=error:+pristr="ERR"
+annotate=error:+pri="3"
+
+# Match warning messages
+rule=warning:*** WARNING: %msg:rest%
+annotate=warning:+pristr="WRN"
+annotate=warning:+pri="4"
+
+# Match debug messages
+rule=debug:### %msg:rest%
+annotate=debug:+pristr="DBG"
+annotate=debug:+pri="7"
+
+# Match info messages (all other messages)
+rule=info:%msg:rest%
+annotate=info:+pristr="INF"
+annotate=info:+pri="6"
+

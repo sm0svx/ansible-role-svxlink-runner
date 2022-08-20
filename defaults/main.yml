@@ -57,3 +57,26 @@ svxlink_runner_sounds_dir: "{{ svxlink_runner_data_dir }}/sounds"
 
 # Enable the use of logrotate for SvxLink applications logs
 svxlink_runner_use_logrotate: true
+
+# Send svxlink syslog rows to the remote logging server host
+svxlink_runner_rsyslog_target_host: ""
+
+# Send svxlink syslog rows to the remote logging server port
+svxlink_runner_rsyslog_target_port: 514
+
+# Send svxlink syslog rows to the remote logging server using protocol
+# "tcp" or "udp"
+svxlink_runner_syslog_protocol: tcp
+
+# Maximum rsyslog priority level to report
+#
+#   0 - Emergency
+#   1 - Alert
+#   2 - Critical
+#   3 - Error
+#   4 - Warning
+#   5 - Notice
+#   6 - Informational
+#   7 - Debug
+#
+svxlink_runner_rsyslog_max_level: 4

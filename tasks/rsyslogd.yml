@@ -1,0 +1,28 @@
+---
+- name: Ensure that rsyslogd is installed
+  package:
+    name: rsyslog
+    state: present
+
+- name: Ensure that the rsyslog configuration is up-to-date
+  template:
+    src: rsyslog-svxlink.conf.j2
+    dest: /etc/rsyslog.d/svxlink.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart_rsyslogd
+
+- name: Ensure that the rsyslog rulebase is up-to-date
+  copy:
+    src: rsyslog-rulebase
+    dest: /etc/svxlink/rsyslog.rulebase
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart_rsyslogd
+
+- name: Ensure that rsyslogd is started
+  service:
+    name: rsyslog
+    state: started

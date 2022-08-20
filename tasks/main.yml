@@ -37,6 +37,14 @@
     svxlink_config_dir: /etc/svxlink
   import_tasks: configure.yml
 
+- name: Manage svxlink rsyslogd remote logging
+  tags:
+    - rsyslogd
+  vars:
+    ansible_become: true
+  import_tasks: rsyslogd.yml
+  when: svxlink_runner_rsyslog_target_host
+
 - name: Enable/disable and start/stop the SvxLink services
   tags:
     - install

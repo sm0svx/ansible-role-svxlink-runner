@@ -1,0 +1,62 @@
+global(
+        preserveFQDN="on"
+)
+
+module(load="imfile")
+module(load="mmnormalize")
+
+input(
+        type="imfile"
+        File="/var/log/svxlink"
+        Tag="svxlink:"
+        Ruleset="svxlink.ruleset"
+)
+
+{#
+template(name="svxlink-file.format" type="list") {
+        property(name="$!date")
+        constant(value=" ")
+        property(name="$!time")
+        constant(value=".")
+        property(name="$!msec")
+        constant(value=" ")
+        property(name="hostname")
+        constant(value=" ")
+        property(name="syslogtag")
+        constant(value=" [")
+        property(name="$!pristr")
+        constant(value=":")
+        property(name="$!pri")
+        constant(value="] ")
+        property(name="$!msg")
+        constant(value="\n")
+}
+#}
+template(name="svxlink-fwd.format" type="list") {
+        constant(value="<")
+        property(name="$!pri")
+        constant(value=">")
+        property(name="timereported" dateFormat="rfc3339")
+        constant(value=" ")
+        property(name="hostname")
+        constant(value=" ")
+        property(name="syslogtag")
+        property(name="$!msg")
+}
+
+ruleset(name="svxlink.ruleset") {
+        action(
+                type="mmnormalize"
+                rulebase="{{ svxlink_runner_config_dir }}/rsyslog.rulebase"
+        )
+        if ($!pri <= {{ svxlink_runner_rsyslog_max_level }}) then {
+                action(
+                        type="omfwd"
+                        Target="{{ svxlink_runner_rsyslog_target_host }}"
+                        Port="{{ svxlink_runner_rsyslog_target_port }}"
+                        Protocol="{{ svxlink_runner_syslog_protocol }}"
+                        Template="svxlink-fwd.format"
+                )
+        }
+}
+
