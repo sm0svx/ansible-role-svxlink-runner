@@ -18,8 +18,8 @@ svxlink_runner_packages:
   - vorbis-tools
   - libcurl4
   - rtl-sdr
-  - libjsoncpp1
-  - python-requests
+  - libjsoncpp24
+  - python3-requests
   - libogg0
   - libgpiod2
 
