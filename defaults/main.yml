@@ -80,3 +80,6 @@ svxlink_runner_syslog_protocol: tcp
 #   7 - Debug
 #
 svxlink_runner_rsyslog_max_level: 4
+
+# The interval, in seconds, with which to insert MARK messages in the log
+svxlink_runner_rsyslog_mark_interval: 86400

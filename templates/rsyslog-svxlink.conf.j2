@@ -1,16 +1,43 @@
+{#
 global(
         preserveFQDN="on"
 )
-
+#}
 module(load="imfile")
 module(load="mmnormalize")
+{% if svxlink_runner_use_svxreflector|bool %}
+
+input(
+        type="imfile"
+        File="/var/log/svxreflector"
+        Tag="svxreflector:"
+        Ruleset="svxlink.ruleset"
+        freshStartTail="on"
+        Facility="local0"
+)
+{% endif %}
+{% if svxlink_runner_use_svxlink|bool %}
 
 input(
         type="imfile"
         File="/var/log/svxlink"
         Tag="svxlink:"
         Ruleset="svxlink.ruleset"
+        freshStartTail="on"
+        Facility="local1"
 )
+{% endif %}
+{% if svxlink_runner_use_remotetrx|bool %}
+
+input(
+        type="imfile"
+        File="/var/log/remotetrx"
+        Tag="remotetrx:"
+        Ruleset="svxlink.ruleset"
+        freshStartTail="on"
+        Facility="local2"
+)
+{% endif %}
 
 {#
 template(name="svxlink-file.format" type="list") {
@@ -41,6 +68,9 @@ template(name="svxlink-fwd.format" type="list") {
         property(name="hostname")
         constant(value=" ")
         property(name="syslogtag")
+        constant(value=" [")
+        property(name="$!pristr")
+        constant(value="] ")
         property(name="$!msg")
 }
 
@@ -59,4 +89,16 @@ ruleset(name="svxlink.ruleset") {
                 )
         }
 }
+{% if svxlink_runner_rsyslog_mark_interval > 0 %}
 
+module(load="immark" interval="{{ svxlink_runner_rsyslog_mark_interval }}")
+
+if (prifilt("*.info") and ($msg contains '-- MARK --')) then {
+        action(
+                type="omfwd"
+                Target="{{ svxlink_runner_rsyslog_target_host }}"
+                Port="{{ svxlink_runner_rsyslog_target_port }}"
+                Protocol="{{ svxlink_runner_syslog_protocol }}"
+        )
+}
+{% endif %}

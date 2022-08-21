@@ -39,7 +39,7 @@
 
 - name: Manage svxlink rsyslogd remote logging
   tags:
-    - rsyslogd
+    - syslog
   vars:
     ansible_become: true
   import_tasks: rsyslogd.yml
