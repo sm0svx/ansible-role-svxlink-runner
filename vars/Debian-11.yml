@@ -20,6 +20,7 @@ svxlink_runner_packages:
   - rtl-sdr
   - libjsoncpp24
   - python3-requests
+  - python3-yaml
   - libogg0
   - libgpiod2
 
