@@ -5,11 +5,13 @@ prefix=%date:date-iso% %time:time-24hr%.%msec:number%:%-:whitespace%
 
 # Match error messages
 rule=error:*** ERROR: %msg:rest%
+rule=error:*** ERROR[%src:char-to:]%]: %msg:rest%
 annotate=error:+pristr="ERR"
 annotate=error:+pri="3"
 
 # Match warning messages
 rule=warning:*** WARNING: %msg:rest%
+rule=warning:*** WARNING[%src:char-to:]%]: %msg:rest%
 annotate=warning:+pristr="WRN"
 annotate=warning:+pri="4"
 

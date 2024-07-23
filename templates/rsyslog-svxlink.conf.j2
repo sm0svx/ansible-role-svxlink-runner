@@ -55,6 +55,7 @@ template(name="svxlink-file.format" type="list") {
         constant(value=":")
         property(name="$!pri")
         constant(value="] ")
+        property(name="$.src")
         property(name="$!msg")
         constant(value="\n")
 }
@@ -71,6 +72,7 @@ template(name="svxlink-fwd.format" type="list") {
         constant(value=" [")
         property(name="$!pristr")
         constant(value="] ")
+        property(name="$.src")
         property(name="$!msg")
 }
 
@@ -79,6 +81,9 @@ ruleset(name="svxlink.ruleset") {
                 type="mmnormalize"
                 rulebase="{{ svxlink_runner_config_dir }}/rsyslog.rulebase"
         )
+        if ($!src != "") then {
+                set $.src = $!src & " ";
+        }
         if ($!pri <= {{ svxlink_runner_rsyslog_max_level }}) then {
                 action(
                         type="omfwd"
