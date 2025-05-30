@@ -58,6 +58,9 @@ svxlink_runner_sounds_dir: "{{ svxlink_runner_data_dir }}/sounds"
 # Enable the use of logrotate for SvxLink applications logs
 svxlink_runner_use_logrotate: true
 
+# How many logfiles to retain not including the current one
+svxlink_runner_logrotate_retain: 4
+
 # Send svxlink syslog rows to the remote logging server host
 svxlink_runner_rsyslog_target_host: ""
 

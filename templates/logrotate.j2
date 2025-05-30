@@ -1,5 +1,5 @@
 /var/log/{{ item.name }} {
-    rotate 4
+    rotate {{ svxlink_runner_logrotate_retain }}
     missingok
     notifempty
     weekly
