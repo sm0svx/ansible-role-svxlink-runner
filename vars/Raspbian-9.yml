@@ -22,6 +22,9 @@ svxlink_runner_packages:
   - python-requests
   - libogg0
   - libgpiod1
+  - ladspa-sdk
+  - tap-plugins
+  - swh-plugins
 
 svxlink_runner_package_ext: "deb"
 

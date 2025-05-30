@@ -23,6 +23,9 @@ svxlink_runner_packages:
   - python3-yaml
   - libogg0
   - libgpiod2
+  - ladspa-sdk
+  - tap-plugins
+  - swh-plugins
 
 svxlink_runner_package_ext: "deb"
 
