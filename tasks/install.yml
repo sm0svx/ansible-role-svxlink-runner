@@ -67,12 +67,20 @@
     force: True
   with_items:
     - "{{ packages }}"
+  register: install_svxlink_pkg
   notify:
     - Restart SvxReflector
     - Restart SvxLink
     - Restart RemoteTrx
     - Restart SvxLinkGpioSetup
   when: svxlink_runner_package_ext | d('') == 'deb'
+
+- name: Reload systemd units if any svxlink packages were updated
+  tags:
+    - package
+  service:
+    daemon_reload: true
+  when: ansible_service_mgr == 'systemd' and install_svxlink_pkg.changed
 
 - name: Ensure svxlink user has correct supplemental groups
   user:
