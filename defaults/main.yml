@@ -86,3 +86,15 @@ svxlink_runner_rsyslog_max_level: 4
 
 # The interval, in seconds, with which to insert MARK messages in the log
 svxlink_runner_rsyslog_mark_interval: 86400
+
+# Where SvxLink store state files
+svxlink_runner_local_state_dir: /var/lib/svxlink
+
+# Root CA PEM
+svxlink_runner_root_ca_key: ""
+
+# Root CA certificate PEM
+svxlink_runner_root_ca_crt: ""
+
+# Root CA certificates PEM bundle
+svxlink_runner_root_ca_bundle: "{{ svxlink_runner_root_ca_crt }}"

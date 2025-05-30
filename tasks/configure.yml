@@ -40,3 +40,56 @@
     #group: root
     state: link
   when: svxlink_runner_use_svxlink
+
+- name: Ensure that the PKI directory exist
+  file:
+    path: "{{ svxlink_runner_local_state_dir + item }}"
+    owner: "{{ svxlink_builder_run_as_user }}"
+    group: "{{ svxlink_builder_run_as_group }}"
+    state: directory
+  with_items:
+    - '/'
+    - '/pki'
+  when: svxlink_runner_use_svxlink or svxlink_runner_use_svxreflector
+
+- name: Ensure that the reflector PKI directories exist
+  file:
+    path: "{{ svxlink_runner_local_state_dir + item }}"
+    owner: "{{ svxlink_builder_run_as_user }}"
+    group: "{{ svxlink_builder_run_as_group }}"
+    state: directory
+  with_items:
+    - '/pki/private'
+    - '/pki/certs'
+    - '/pki/pending_csrs'
+    - '/pki/csrs'
+  when: svxlink_runner_use_svxreflector
+
+- name: Ensure that the reflector server root CA key is up to date
+  copy:
+    content: "{{ svxlink_runner_root_ca_key }}"
+    dest: "{{ svxlink_runner_local_state_dir }}/pki/private/svxreflector_root_ca.key"
+    owner: "{{ svxlink_builder_run_as_user }}"
+    group: "{{ svxlink_builder_run_as_group }}"
+    mode: 0620
+  when: svxlink_runner_use_svxreflector and svxlink_runner_root_ca_key | length > 0
+
+- name: Ensure that the reflector server root CA cert is up to date
+  copy:
+    content: "{{ svxlink_runner_root_ca_crt }}"
+    dest: "{{ svxlink_runner_local_state_dir }}/pki/certs/svxreflector_root_ca.crt"
+    owner: "{{ svxlink_builder_run_as_user }}"
+    group: "{{ svxlink_builder_run_as_group }}"
+    mode: 0664
+  when: svxlink_runner_use_svxreflector and svxlink_runner_root_ca_crt | length > 0
+
+- name: Ensure that the reflector CA bundle is up to date
+  copy:
+    content: "{{ svxlink_runner_root_ca_bundle }}"
+    dest: "{{ svxlink_runner_local_state_dir }}/pki/ca-bundle.crt"
+    owner: "{{ svxlink_builder_run_as_user }}"
+    group: "{{ svxlink_builder_run_as_group }}"
+    mode: 0664
+  when: |
+    (svxlink_runner_use_svxreflector or svxlink_runner_use_svxlink) and
+    svxlink_runner_root_ca_bundle | length > 0
