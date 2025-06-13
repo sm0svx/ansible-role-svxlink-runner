@@ -37,17 +37,6 @@
     state: restarted
   when: svxlink_runner_use_svxlink or svxlink_runner_use_remotetrx
 
-- name: Start SvxLink
-  vars:
-    ansible_become: true
-  service:
-    name: svxlink
-    state: started
-  when: svxlink_runner_use_svxlink
-  listen:
-    - "Restart SvxLink"
-    - "Restart SvxLinkGpioSetup"
-
 - name: Start RemoteTrx
   vars:
     ansible_become: true
@@ -57,6 +46,17 @@
   when: svxlink_runner_use_remotetrx
   listen:
     - "Restart RemoteTrx"
+    - "Restart SvxLinkGpioSetup"
+
+- name: Start SvxLink
+  vars:
+    ansible_become: true
+  service:
+    name: svxlink
+    state: started
+  when: svxlink_runner_use_svxlink
+  listen:
+    - "Restart SvxLink"
     - "Restart SvxLinkGpioSetup"
 
 - name: Restart Rsyslogd
