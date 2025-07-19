@@ -15,6 +15,11 @@ rule=warning:*** WARNING[%src:char-to:]%]: %msg:rest%
 annotate=warning:+pristr="WRN"
 annotate=warning:+pri="4"
 
+# Match notice messages
+rule=notice:NOTICE: %msg:rest%
+annotate=notice:+pristr="NOT"
+annotate=notice:+pri="5"
+
 # Match debug messages
 rule=debug:### %msg:rest%
 annotate=debug:+pristr="DBG"
