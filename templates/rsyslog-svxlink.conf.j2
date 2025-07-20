@@ -94,6 +94,16 @@ ruleset(name="svxlink.ruleset") {
                 )
         }
 }
+
+if (prifilt("*.{{ svxlink_runner_rsyslog_max_level }}") and (($programname == 'svxlink') or ($programname == 'remotetrx') or ($programname == 'svxreflector'))) then {
+        action(
+                type="omfwd"
+                Target="{{ svxlink_runner_rsyslog_target_host }}"
+                Port="{{ svxlink_runner_rsyslog_target_port }}"
+                Protocol="{{ svxlink_runner_syslog_protocol }}"
+        )
+}
+
 {% if svxlink_runner_rsyslog_mark_interval > 0 %}
 
 module(load="immark" interval="{{ svxlink_runner_rsyslog_mark_interval }}")
