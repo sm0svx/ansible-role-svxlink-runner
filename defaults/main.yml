@@ -19,6 +19,10 @@ svxlink_runner_config:
     dest: "/var/lib/alsa"
     owner: "root"
     group: "root"
+  - src: "files/{{ inventory_hostname }}/systemd"
+    dest: "/etc/default"
+    owner: "root"
+    group: "root"
 
 # The owner of the configuration files
 svxlink_runner_config_owner: "root"
